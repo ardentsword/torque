@@ -27,7 +27,11 @@ if ( isset($_POST["selmonth"]) ) {
 } elseif ( isset($_GET["month"])) {
 	$filtermonth = $_GET["month"];
 } else {
-	$filtermonth = date('F');
+	if ( isset($_POST["selyear"]) || isset($_GET["year"]) ) {
+		$filtermonth = "%";
+	} else {
+		$filtermonth = date('F');
+	}
 }
 if ( $filtermonth == "ALL" ) {
 	$filtermonth = "%";
@@ -71,7 +75,7 @@ if ( $filteryear <> "%" || $filtermonth <> "%" || $filterprofile <> "%") {
 if ( isset($_GET['id'])) {
 	$sessionqrystring = $sessionqrystring . $orselector . "( session LIKE '" . $_GET['id'] . "' )";
 }
-$sessionqrystring = $sessionqrystring . " GROUP BY session ORDER BY time DESC";
+$sessionqrystring = $sessionqrystring . " GROUP BY session, profileName, timestart, timeend, sessionsize ORDER BY session DESC";
 // Get list of unique session IDs
 $sessionqry = mysqli_query($con, $sessionqrystring) or die(mysql_error());
 
