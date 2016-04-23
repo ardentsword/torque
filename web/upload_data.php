@@ -3,13 +3,13 @@ require_once ('creds.php');
 require_once ('auth_app.php');
 
 // Connect to Database
-$con = mysql_connect($db_host, $db_user, $db_pass) or die(mysql_error());
-mysql_select_db($db_name, $con) or die(mysql_error());
+$con = mysqli_connect($db_host, $db_user, $db_pass) or die(mysqli_error($con));
+mysqli_select_db($con, $db_name) or die(mysqli_error($con));
 
 // Create an array of all the existing fields in the database
-$result = mysql_query("SHOW COLUMNS FROM $db_table", $con) or die(mysql_error());
-if (mysql_num_rows($result) > 0) {
-  while ($row = mysql_fetch_assoc($result)) {
+$result = mysqli_query($con, "SHOW COLUMNS FROM $db_table") or die(mysqli_error($con));
+if (mysqli_num_rows($result) > 0) {
+  while ($row = mysqli_fetch_assoc($result)) {
     $dbfields[]=($row['Field']);
   }
 }
@@ -66,8 +66,8 @@ if (sizeof($_GET) > 0) {
         $sqlalter = "ALTER TABLE $db_table ADD $key VARCHAR(255) NOT NULL default 'Not Specified'";
         $sqlalterkey = "INSERT INTO $db_keys_table (id, description, type, populated) VALUES ('$key', '$key', 'varchar(255)', '1')";
       }
-      mysql_query($sqlalter, $con) or die(mysql_error());
-      mysql_query($sqlalterkey, $con) or die(mysql_error());
+      mysqli_query($con, $sqlalter) or die(mysqli_error($con));
+      mysqli_query($con, $sqlalterkey) or die(mysqli_error($con));
     }
   }
   // The way session uploads work, there's a separate HTTP call for each datapoint.  This is why raw logs is
@@ -79,25 +79,25 @@ if (sizeof($_GET) > 0) {
   if ((sizeof($rawkeys) === sizeof($rawvalues)) && sizeof($rawkeys) > 0 && (sizeof($sesskeys) === sizeof($sessvalues)) && sizeof($sesskeys) > 0) {
     // Now insert the data for all the fields into the raw logs table
     $sql = "INSERT INTO $db_table (".implode(",", $rawkeys).") VALUES (".implode(",", $rawvalues).")";
-    mysql_query($sql, $con) or die(mysql_error());
+    mysqli_query($con, $sql) or die(mysql_error());
     // See if there is already an entry in the sessions table for this session
-    $sessionqry = mysql_query("SELECT session, sessionsize FROM $db_sessions_table WHERE session LIKE '$sessuploadid'", $con) or die(mysql_error());
-    if (mysql_num_rows($sessionqry) > 0) {
+    $sessionqry = mysqli_query($con, "SELECT session, sessionsize FROM $db_sessions_table WHERE session LIKE '$sessuploadid'") or die(mysql_error());
+    if (mysqli_num_rows($sessionqry) > 0) {
       // If there's an entry in the session table for this session, update the session end time and the datapoint count
-      while($row = mysql_fetch_assoc($sessionqry)) {
+      while($row = mysqli_fetch_assoc($sessionqry)) {
         $sesssizecount = $row["sessionsize"] + 1;
 //        $sessionqrystring = "UPDATE $db_sessions_table SET timeend='$sesstime', sessionsize='$sesssizecount' WHERE session LIKE '$sessuploadid'";
         $sessionqrystring = "UPDATE $db_sessions_table SET timeend='$sesstime', sessionsize='$sesssizecount'$sessprofilequery WHERE session LIKE '$sessuploadid'";
-        mysql_query($sessionqrystring, $con) or die(mysql_error());
+        mysqli_query($con, $sessionqrystring) or die(mysql_error());
       }
     } else {
       // If this is a new session, insert an entry in the sessions table and then update the start time and datapoint count
       $sql = "INSERT INTO $db_sessions_table (".implode(",", $sesskeys).", timestart, sessionsize) VALUES (".implode(",", $sessvalues).", $sesstime, '1')";
-      mysql_query($sql, $con) or die(mysql_error());
+      mysqli_query($con, $sql) or die(mysql_error());
     }
   }
 }
-mysql_close($con);
+mysqli_close($con);
 
 // Return the response required by Torque
 echo "OK!";

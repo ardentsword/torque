@@ -6,8 +6,8 @@ session_set_cookie_params(0,dirname($_SERVER['SCRIPT_NAME']));
 if (!isset($_SESSION)) { session_start(); }
 
 // Connect to Database
-$con = mysqli_connect($db_host, $db_user, $db_pass) or die(mysql_error());
-mysqli_select_db($con, $db_name) or die(mysql_error());
+$con = mysqli_connect($db_host, $db_user, $db_pass) or die(mysqli_error($con));
+mysqli_select_db($con, $db_name) or die(mysqli_error($con));
 
 // Process the 4 possibilities for the year filter: Set in POST, Set in GET, select all possible years, or the default: select the current year
 if ( isset($_POST["selyear"]) ) {
@@ -77,7 +77,7 @@ if ( isset($_GET['id'])) {
 }
 $sessionqrystring = $sessionqrystring . " GROUP BY session, profileName, timestart, timeend, sessionsize ORDER BY session DESC";
 // Get list of unique session IDs
-$sessionqry = mysqli_query($con, $sessionqrystring) or die(mysql_error());
+$sessionqry = mysqli_query($con, $sessionqrystring) or die(mysqli_error($con));
 
 // Create an array mapping session IDs to date strings
 $seshdates = array();
