@@ -6,8 +6,8 @@ session_set_cookie_params(0,dirname($_SERVER['SCRIPT_NAME']));
 if (!isset($_SESSION)) { session_start(); }
 
 // Connect to Database
-$con = mysql_connect($db_host, $db_user, $db_pass) or die(mysql_error());
-mysql_select_db($db_name, $con) or die(mysql_error());
+$con = mysqli_connect($db_host, $db_user, $db_pass) or die(mysql_error());
+mysqli_select_db($con, $db_name) or die(mysql_error());
 
 // Process the 4 possibilities for the year filter: Set in POST, Set in GET, select all possible years, or the default: select the current year
 if ( isset($_POST["selyear"]) ) {
@@ -73,13 +73,13 @@ if ( isset($_GET['id'])) {
 }
 $sessionqrystring = $sessionqrystring . " GROUP BY session ORDER BY time DESC";
 // Get list of unique session IDs
-$sessionqry = mysql_query($sessionqrystring, $con) or die(mysql_error());
+$sessionqry = mysqli_query($con, $sessionqrystring) or die(mysql_error());
 
 // Create an array mapping session IDs to date strings
 $seshdates = array();
 $seshsizes = array();
 $seshprofile = array();
-while($row = mysql_fetch_assoc($sessionqry)) {
+while($row = mysqli_fetch_assoc($sessionqry)) {
     $session_duration_str = gmdate("H:i:s", ($row["timeend"] - $row["timestart"])/1000);
     $session_profileName = $row["profileName"];
 
@@ -95,8 +95,8 @@ while($row = mysql_fetch_assoc($sessionqry)) {
     else {}
 }
 
-mysql_free_result($sessionqry);
-mysql_close($con);
+mysqli_free_result($sessionqry);
+mysqli_close($con);
 //echo "<!-- End get_session.php at ".date("H:i:s", microtime(true))." -->\r\n";
 
 ?>

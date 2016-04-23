@@ -19,8 +19,8 @@ if ( isset($_SESSION['time'] ) ) {
 }
 
 // Define the database connections
-$con = mysql_connect($db_host, $db_user, $db_pass) or die(mysql_error());
-mysql_select_db($db_name, $con) or die(mysql_error());
+$con = mysqli_connect($db_host, $db_user, $db_pass) or die(mysql_error());
+mysqli_select_db($con, $db_name) or die(mysql_error());
 
 // Capture the session ID if one has been chosen already
 if (isset($_GET["id"])) {

@@ -3,8 +3,8 @@
 require_once("./creds.php");
 require_once("./parse_functions.php");
 // Connect to Database
-mysql_connect($db_host, $db_user, $db_pass) or die(mysql_error());
-mysql_select_db($db_name) or die(mysql_error());
+$plot = mysqli_connect($db_host, $db_user, $db_pass) or die(mysql_error());
+mysqli_select_db($plot, $db_name) or die(mysql_error());
 
 // Convert data units
 // TODO: Use the userDefault fields to do these conversions dynamically
